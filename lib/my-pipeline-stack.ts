@@ -13,11 +13,12 @@ import { AmplifyStage } from './stages/amplify-stage';
     const pipeline = new CodePipeline(this, 'Pipeline', {
       // The pipeline name
       pipelineName: 'MyCdkPipeline',
-
        // How it will be built and synthesized
        synth: new ShellStep('Synth', {
          // Where the source can be found
-         input: CodePipelineSource.gitHub('keshavnath1/mycdkpipeline', 'main'),
+         input: CodePipelineSource.connection('keshavnath1/mycdkpipeline', 'main',{
+          connectionArn: 'arn:aws:codestar-connections:us-east-1:720158199606:connection/c9f1ce80-2c57-45ba-a753-0bacb513ed9f', // Created using the AWS console * });',
+        }),
          
          // Install dependencies, build and run cdk synth
          commands: [
