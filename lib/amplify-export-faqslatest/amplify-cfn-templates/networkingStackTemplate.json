@@ -1,0 +1,553 @@
+{
+  "Conditions": {
+    "UseNewVpcCondition": {
+      "Fn::And": [
+        {
+          "Fn::Equals": [
+            "vpc-00f66c1f7c00f555a",
+            ""
+          ]
+        },
+        {
+          "Fn::Equals": [
+            "igw-063bc2dbad00111b5",
+            ""
+          ]
+        }
+      ]
+    }
+  },
+  "Resources": {
+    "AmplifyVPCdonotdeleteDD847F21": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": "10.0.0.0/16",
+        "EnableDnsHostnames": true,
+        "EnableDnsSupport": true,
+        "InstanceTenancy": "default",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Amplify/VPC-do-not-delete"
+          }
+        ]
+      },
+      "DeletionPolicy": "Retain",
+      "Condition": "UseNewVpcCondition"
+    },
+    "InternetGateway": {
+      "Type": "AWS::EC2::InternetGateway",
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Amplify/InternetGateway"
+          }
+        ]
+      },
+      "DeletionPolicy": "Retain",
+      "Condition": "UseNewVpcCondition"
+    },
+    "VPCGatewayAttachment": {
+      "Type": "AWS::EC2::VPCGatewayAttachment",
+      "Properties": {
+        "VpcId": {
+          "Ref": "AmplifyVPCdonotdeleteDD847F21"
+        },
+        "InternetGatewayId": {
+          "Ref": "InternetGateway"
+        }
+      },
+      "DeletionPolicy": "Retain",
+      "Condition": "UseNewVpcCondition"
+    },
+    "Cluster": {
+      "Type": "AWS::ECS::Cluster"
+    },
+    "Nacl00B1FA37": {
+      "Type": "AWS::EC2::NetworkAcl",
+      "Properties": {
+        "VpcId": {
+          "Fn::If": [
+            "UseNewVpcCondition",
+            {
+              "Ref": "AmplifyVPCdonotdeleteDD847F21"
+            },
+            "vpc-00f66c1f7c00f555a"
+          ]
+        }
+      }
+    },
+    "NaclEgressB627E436": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "Nacl00B1FA37"
+        },
+        "Protocol": -1,
+        "RuleAction": "allow",
+        "RuleNumber": 100,
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": true
+      }
+    },
+    "NaclIngressVPCB50EA4D0": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "Nacl00B1FA37"
+        },
+        "Protocol": -1,
+        "RuleAction": "deny",
+        "RuleNumber": 200,
+        "CidrBlock": "10.0.0.0/16",
+        "Egress": false
+      }
+    },
+    "NaclIngressInternetC03F4A4B": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "Nacl00B1FA37"
+        },
+        "Protocol": -1,
+        "RuleAction": "allow",
+        "RuleNumber": 300,
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": false
+      }
+    },
+    "NaclIngressEnv1aA3278607": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "Nacl00B1FA37"
+        },
+        "Protocol": -1,
+        "RuleAction": "allow",
+        "RuleNumber": 100,
+        "CidrBlock": {
+          "Fn::FindInMap": [
+            "AzsMap",
+            "us-east-1a",
+            "SubnetCidrBlock"
+          ]
+        },
+        "Egress": false
+      }
+    },
+    "NaclAmplifyPublicSubnet1a92870E90498534DF": {
+      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "Nacl00B1FA37"
+        },
+        "SubnetId": {
+          "Ref": "PublicSubnet1aSubnetDB999A29"
+        }
+      }
+    },
+    "NaclIngressEnv1b6A075FAA": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "Nacl00B1FA37"
+        },
+        "Protocol": -1,
+        "RuleAction": "allow",
+        "RuleNumber": 101,
+        "CidrBlock": {
+          "Fn::FindInMap": [
+            "AzsMap",
+            "us-east-1b",
+            "SubnetCidrBlock"
+          ]
+        },
+        "Egress": false
+      }
+    },
+    "NaclAmplifyPublicSubnet1bDD3506A152727D73": {
+      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "Nacl00B1FA37"
+        },
+        "SubnetId": {
+          "Ref": "PublicSubnet1bSubnetEBB8D266"
+        }
+      }
+    },
+    "NaclIngressEnv1c3D2599B8": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "Nacl00B1FA37"
+        },
+        "Protocol": -1,
+        "RuleAction": "allow",
+        "RuleNumber": 102,
+        "CidrBlock": {
+          "Fn::FindInMap": [
+            "AzsMap",
+            "us-east-1c",
+            "SubnetCidrBlock"
+          ]
+        },
+        "Egress": false
+      }
+    },
+    "NaclAmplifyPublicSubnet1c6755BC8168706517": {
+      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "Nacl00B1FA37"
+        },
+        "SubnetId": {
+          "Ref": "PublicSubnet1cSubnet7DB7B3CE"
+        }
+      }
+    },
+    "PublicSubnet1aSubnetDB999A29": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": {
+          "Fn::If": [
+            "UseNewVpcCondition",
+            {
+              "Ref": "AmplifyVPCdonotdeleteDD847F21"
+            },
+            "vpc-00f66c1f7c00f555a"
+          ]
+        },
+        "AvailabilityZone": "us-east-1a",
+        "CidrBlock": {
+          "Fn::FindInMap": [
+            "AzsMap",
+            "us-east-1a",
+            "SubnetCidrBlock"
+          ]
+        },
+        "MapPublicIpOnLaunch": true,
+        "Tags": [
+          {
+            "Key": "amplify-env",
+            "Value": "amplify-faqslatest-dev-102821"
+          }
+        ]
+      }
+    },
+    "PublicSubnet1aRouteTable6FC198C6": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Fn::If": [
+            "UseNewVpcCondition",
+            {
+              "Ref": "AmplifyVPCdonotdeleteDD847F21"
+            },
+            "vpc-00f66c1f7c00f555a"
+          ]
+        }
+      }
+    },
+    "PublicSubnet1aRouteTableAssociation6A8F37AB": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "PublicSubnet1aRouteTable6FC198C6"
+        },
+        "SubnetId": {
+          "Ref": "PublicSubnet1aSubnetDB999A29"
+        }
+      }
+    },
+    "DefaultRoute1a": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "PublicSubnet1aRouteTable6FC198C6"
+        },
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": {
+          "Fn::If": [
+            "UseNewVpcCondition",
+            {
+              "Ref": "InternetGateway"
+            },
+            "igw-063bc2dbad00111b5"
+          ]
+        }
+      }
+    },
+    "PublicSubnet1bSubnetEBB8D266": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": {
+          "Fn::If": [
+            "UseNewVpcCondition",
+            {
+              "Ref": "AmplifyVPCdonotdeleteDD847F21"
+            },
+            "vpc-00f66c1f7c00f555a"
+          ]
+        },
+        "AvailabilityZone": "us-east-1b",
+        "CidrBlock": {
+          "Fn::FindInMap": [
+            "AzsMap",
+            "us-east-1b",
+            "SubnetCidrBlock"
+          ]
+        },
+        "MapPublicIpOnLaunch": true,
+        "Tags": [
+          {
+            "Key": "amplify-env",
+            "Value": "amplify-faqslatest-dev-102821"
+          }
+        ]
+      }
+    },
+    "PublicSubnet1bRouteTableD302FE1E": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Fn::If": [
+            "UseNewVpcCondition",
+            {
+              "Ref": "AmplifyVPCdonotdeleteDD847F21"
+            },
+            "vpc-00f66c1f7c00f555a"
+          ]
+        }
+      }
+    },
+    "PublicSubnet1bRouteTableAssociation903B2F81": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "PublicSubnet1bRouteTableD302FE1E"
+        },
+        "SubnetId": {
+          "Ref": "PublicSubnet1bSubnetEBB8D266"
+        }
+      }
+    },
+    "DefaultRoute1b": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "PublicSubnet1bRouteTableD302FE1E"
+        },
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": {
+          "Fn::If": [
+            "UseNewVpcCondition",
+            {
+              "Ref": "InternetGateway"
+            },
+            "igw-063bc2dbad00111b5"
+          ]
+        }
+      }
+    },
+    "PublicSubnet1cSubnet7DB7B3CE": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": {
+          "Fn::If": [
+            "UseNewVpcCondition",
+            {
+              "Ref": "AmplifyVPCdonotdeleteDD847F21"
+            },
+            "vpc-00f66c1f7c00f555a"
+          ]
+        },
+        "AvailabilityZone": "us-east-1c",
+        "CidrBlock": {
+          "Fn::FindInMap": [
+            "AzsMap",
+            "us-east-1c",
+            "SubnetCidrBlock"
+          ]
+        },
+        "MapPublicIpOnLaunch": true,
+        "Tags": [
+          {
+            "Key": "amplify-env",
+            "Value": "amplify-faqslatest-dev-102821"
+          }
+        ]
+      }
+    },
+    "PublicSubnet1cRouteTable504F6184": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Fn::If": [
+            "UseNewVpcCondition",
+            {
+              "Ref": "AmplifyVPCdonotdeleteDD847F21"
+            },
+            "vpc-00f66c1f7c00f555a"
+          ]
+        }
+      }
+    },
+    "PublicSubnet1cRouteTableAssociation97E94BDF": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "PublicSubnet1cRouteTable504F6184"
+        },
+        "SubnetId": {
+          "Ref": "PublicSubnet1cSubnet7DB7B3CE"
+        }
+      }
+    },
+    "DefaultRoute1c": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "PublicSubnet1cRouteTable504F6184"
+        },
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": {
+          "Fn::If": [
+            "UseNewVpcCondition",
+            {
+              "Ref": "InternetGateway"
+            },
+            "igw-063bc2dbad00111b5"
+          ]
+        }
+      }
+    },
+    "VpcLink": {
+      "Type": "AWS::ApiGatewayV2::VpcLink",
+      "Properties": {
+        "Name": "amplify-faqslatest-dev-102821VpcLink",
+        "SubnetIds": [
+          {
+            "Ref": "PublicSubnet1aSubnetDB999A29"
+          },
+          {
+            "Ref": "PublicSubnet1bSubnetEBB8D266"
+          },
+          {
+            "Ref": "PublicSubnet1cSubnet7DB7B3CE"
+          }
+        ]
+      }
+    },
+    "Namespace9B63B8C8": {
+      "Type": "AWS::ServiceDiscovery::PrivateDnsNamespace",
+      "Properties": {
+        "Name": {
+          "Fn::Join": [
+            "-",
+            [
+              "amplify-faqslatest-dev-102821",
+              {
+                "Fn::If": [
+                  "UseNewVpcCondition",
+                  {
+                    "Ref": "AmplifyVPCdonotdeleteDD847F21"
+                  },
+                  "vpc-00f66c1f7c00f555a"
+                ]
+              }
+            ]
+          ]
+        },
+        "Vpc": {
+          "Fn::If": [
+            "UseNewVpcCondition",
+            {
+              "Ref": "AmplifyVPCdonotdeleteDD847F21"
+            },
+            "vpc-00f66c1f7c00f555a"
+          ]
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "VpcId": {
+      "Value": {
+        "Fn::If": [
+          "UseNewVpcCondition",
+          {
+            "Ref": "AmplifyVPCdonotdeleteDD847F21"
+          },
+          "vpc-00f66c1f7c00f555a"
+        ]
+      }
+    },
+    "VpcCidrBlock": {
+      "Value": "10.0.0.0/16"
+    },
+    "Igw": {
+      "Value": {
+        "Fn::If": [
+          "UseNewVpcCondition",
+          {
+            "Ref": "InternetGateway"
+          },
+          "igw-063bc2dbad00111b5"
+        ]
+      }
+    },
+    "ClusterName": {
+      "Value": {
+        "Ref": "Cluster"
+      }
+    },
+    "SubnetIds": {
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            {
+              "Ref": "PublicSubnet1aSubnetDB999A29"
+            },
+            ",",
+            {
+              "Ref": "PublicSubnet1bSubnetEBB8D266"
+            },
+            ",",
+            {
+              "Ref": "PublicSubnet1cSubnet7DB7B3CE"
+            }
+          ]
+        ]
+      }
+    },
+    "VpcLinkId": {
+      "Value": {
+        "Ref": "VpcLink"
+      }
+    },
+    "CloudMapNamespaceId": {
+      "Value": {
+        "Fn::GetAtt": [
+          "Namespace9B63B8C8",
+          "Id"
+        ]
+      }
+    }
+  },
+  "Mappings": {
+    "AzsMap": {
+      "us-east-1a": {
+        "SubnetCidrBlock": "10.0.6.0/24"
+      },
+      "us-east-1c": {
+        "SubnetCidrBlock": "10.0.8.0/24"
+      },
+      "us-east-1b": {
+        "SubnetCidrBlock": "10.0.7.0/24"
+      }
+    }
+  }
+}

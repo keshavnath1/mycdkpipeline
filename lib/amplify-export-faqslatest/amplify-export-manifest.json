@@ -1,0 +1,29 @@
+{
+  "stackName": "amplify-faqslatest-dev-102821",
+  "props": {
+    "templateFile": "root-stack-template.json",
+    "parameters": {
+      "AuthRoleName": "amplify-faqslatest-dev-102821-authRole",
+      "UnauthRoleName": "amplify-faqslatest-dev-102821-unauthRole",
+      "DeploymentBucketName": "amplify-faqslatest-dev-102821-deployment"
+    },
+    "preserveLogicalIds": true,
+    "loadNestedStacks": {
+      "NetworkStack": {
+        "templateFile": "amplify-cfn-templates\\networkingStackTemplate.json",
+        "parameters": {},
+        "preserveLogicalIds": true,
+        "loadNestedStacks": {}
+      },
+      "apico": {
+        "templateFile": "api\\co\\co-cloudformation-template.json",
+        "parameters": {
+          "ParamZipPath": "amplify-builds/co-637a7448346148336a68-build.zip",
+          "env": "dev"
+        },
+        "preserveLogicalIds": true,
+        "loadNestedStacks": {}
+      }
+    }
+  }
+}
